@@ -2,10 +2,15 @@ debugger;
 const express = require('express');
 require("../src/db/connection");
 const userCollection = require("../src/models/user");
+const productCollection = require("../src/models/product");
 const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const multer = require('multer');
+const uploads = multer({});
+const CSVToJSON = require('csvtojson');
 
 app.use(express.json());
 
@@ -46,13 +51,41 @@ app.post("/login", async (req, res) => {
     }
 });
 
+// Fetch users list
 app.get("/userlist", async (req, res) => {
     try{
-        const userList = await userCollection.find({}, { projections: {_id: 1, firstName: 1}});
-        console.log(userList);
+        const userList = await userCollection.find({}, {_id: 0, firstName: 1, lastName: 1});
+        res.send(userList);
     } catch (err) {
         res.status(400).send(err);
     }
+});
+
+// Add product
+app.post("/addproduct", uploads.single("file"), (req, res) => {
+    let str = (req.file.buffer.toString());
+    var productList;
+    CSVToJSON().fromString (str).then((jsonObj) => {
+        //console.log(jsonObj);
+        for(var x = 0; x < jsonObj; x++) {
+            var temp = parseFloat(jsonObj[x].quantity);
+            jsonObj[x].quantity = temp;
+
+            temp = parseFloat(jsonObj[x].price);
+            jsonObj[x].price = temp;
+        }
+        productList = jsonObj;
+    }).then(() => {
+        try {
+            productCollection.insertMany(productList, (err, result) => {
+                if(err) res.status(407).send(err);
+            });
+
+            res.status(201).send();
+        }catch(err) {
+            res.status(409).send(err);
+        }
+    });
 });
 
 app.listen(PORT, () => {
