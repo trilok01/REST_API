@@ -1,18 +1,21 @@
-debugger;
 const express = require('express');
 require("../src/db/connection");
 const userCollection = require("../src/models/user");
 const productCollection = require("../src/models/product");
-const jwt = require('jsonwebtoken');
+const CSVToJSON = require('csvtojson');
+const multer = require('multer');
+const uploads = multer({});
+const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const multer = require('multer');
-const uploads = multer({});
-const CSVToJSON = require('csvtojson');
-
 app.use(express.json());
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+}));
+app.use(express.urlencoded());
 
 app.get("/", (req, res) => {
     res.send("Hello from the server");
@@ -40,7 +43,6 @@ app.post("/login", async (req, res) => {
         const username = req.body.username;
         const password = req.body.password;
         const user = await userCollection.findOne({username: username, password: password});
-        
         if(user) {
             res.send(user);
         } else {
@@ -66,22 +68,14 @@ app.post("/addproduct", uploads.single("file"), (req, res) => {
     let str = (req.file.buffer.toString());
     var productList;
     CSVToJSON().fromString (str).then((jsonObj) => {
-        //console.log(jsonObj);
-        for(var x = 0; x < jsonObj; x++) {
-            var temp = parseFloat(jsonObj[x].quantity);
-            jsonObj[x].quantity = temp;
-
-            temp = parseFloat(jsonObj[x].price);
-            jsonObj[x].price = temp;
-        }
         productList = jsonObj;
     }).then(() => {
         try {
-            productCollection.insertMany(productList, (err, result) => {
-                if(err) res.status(407).send(err);
+            productCollection.insertMany(productList).then(() => {
+                res.status(200).send({"message": "Inserted Successfully"});
+            }).catch((err) => {
+                res.status(422).send({"message": err.message});
             });
-
-            res.status(201).send();
         }catch(err) {
             res.status(409).send(err);
         }
