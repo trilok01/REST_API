@@ -6,6 +6,7 @@ const CSVToJSON = require('csvtojson');
 const multer = require('multer');
 const uploads = multer({});
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,7 +28,7 @@ app.post("/signup", async (req, res) => {
         const createUser = new userCollection(req.body);
 
         // Create a Token
-        const token = await createUser.generateAuthToken();
+        await createUser.generateAuthToken();
 
         // Insert user into DB
         const insertUser = await createUser.save();
@@ -42,19 +43,27 @@ app.post("/login", async (req, res) => {
     try {
         const username = req.body.username;
         const password = req.body.password;
-        const user = await userCollection.findOne({username: username, password: password});
+        const user = await userCollection.findOne({username: username, password: password}, {password: 0});
         if(user) {
-            res.send(user);
+            const token = jwt.sign({
+                _id: user._id,
+                username: user.username
+            }, "This is the secret key for authentication", { expiresIn: '300s' });
+
+            res.status(200).send({auth: true, token: token});
+
         } else {
             res.status(401).send("Incorrect User Name or Password");
         }
     } catch(err) {
-        res.status(400).send(err);
+        res.status(400).send("" + err);
     }
 });
 
+
+
 // Fetch users list
-app.get("/userlist", async (req, res) => {
+app.get("/userlist", verifyToken, async (req, res) => {
     try{
         const userList = await userCollection.find({}, {_id: 0, firstName: 1, lastName: 1});
         res.send(userList);
@@ -64,13 +73,17 @@ app.get("/userlist", async (req, res) => {
 });
 
 // Add product
-app.post("/addproduct", uploads.single("file"), (req, res) => {
+app.post("/addproduct", verifyToken, uploads.single("file"), (req, res) => {
     let str = (req.file.buffer.toString());
     var productList;
     CSVToJSON().fromString (str).then((jsonObj) => {
         productList = jsonObj;
     }).then(() => {
         try {
+            for(var i = 0; i < productList.length; i++) {
+                productList[i]._createdBy = req.username;
+            }
+
             productCollection.insertMany(productList).then(() => {
                 res.status(200).send({"message": "Inserted Successfully"});
             }).catch((err) => {
@@ -81,6 +94,18 @@ app.post("/addproduct", uploads.single("file"), (req, res) => {
         }
     });
 });
+
+function verifyToken(req, res, next) {
+    var token = req.headers['x-access-token'];
+    if(!token) return res.status(401).send({auth: false, message: 'No token provided'});
+
+    jwt.verify(token, "This is the secret key for authentication", (err, decoded) => {
+        if(err) return res.status(500).send({auth: false, message: 'Failed to authenticate token.'});
+
+        req.username = decoded.username;
+        next();
+    });
+}
 
 app.listen(PORT, () => {
     console.log(`Listening on port no ${PORT}`);

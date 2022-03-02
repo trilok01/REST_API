@@ -20,21 +20,21 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    tokens: [{
-        token: {
-            type:String,
-            required: true
-        }
-    }]
+    token: {
+        type:String,
+        required: true
+    }
 });
 
 // Generating Tokens
 userSchema.methods.generateAuthToken = async function() {
     try {
-        const token = jwt.sign({_id:this._id.toString()}, "this is the secret string needed for the authentication of this token");
-        this.tokens = this.tokens.concat({token: token});
+        const token = jwt.sign({
+            _id: this._id,
+            username: this.username
+        }, "This is the secret key for authentication", { expiresIn: '30s' });
+        this.token = token;
         await this.save();
-        return token;
     } catch(err) {
         res.send("The error part " + err);
         console.log("The error part " + err);

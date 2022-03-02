@@ -20,8 +20,7 @@ const productSchema = new mongoose.Schema({
     },
     _createdBy: {
         type: String,
-        required: true,
-        default: "Trilok"
+        required: true
     }
 });
 
