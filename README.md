@@ -38,35 +38,51 @@ Method --> `POST`
 3. In Postman go to `Body -> raw -> JSON`  
 4. Insert the record in JSON format:  
 
-    `{
+    ```JSON
+    {
         "firstName": "f_name",
         "lastName": "l_name",
         "username": "u_name",
         "password": "password"
-    }`
+    }
+    ```
 5. Click Send.  
-
+***
 LOGIN  
 Method --> `POST`
 
 `localhost:3000/login`
 
 1. Inside Postman go to: `Body -> x-www-form-urlencoded`
-2. Give username and password in key value pair format.
-3. After Successful Logging in it will generate an `Authentication Token`
-4. Click Send.
+2. Give username and password in key value pair format.  
 
+    |KEY|VALUE|
+    |---|-----|
+    |username|ABC|
+    |password|pwd|
+3. Click Send
+4. After Successful Logging in it will generate an `Authentication Token`
+    ```JSON
+    {
+        "auth": true,
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjFmNzRhNTVjOGY3NGI2ZDNiYzA5NWIiLCJ1c2VybmFtZSI6Im1vbnUiLCJpYXQiOjE2NDc0Mzc0ODUsImV4cCI6MTY0NzQzNzc4NX0.qUkMm4JqjNF1dZcg5BPohxvZb5PT_8YV-YTvildk0zI"
+    }
+    ```
+***
 USERLIST  
 Method --> `GET`
 
 `localhost:3000/userlist`
 
-1. You can only access this address if you have `Authentication Token` while login.
+1. You can only access this address if you have `Authentication Token` generated while login.
 2. Go to `headers` in Postman.
 3. Give a key value pair in header:
-    `key: x-access-token value: token_generated_on_login`
-4. Click Send.
 
+    |KEY|VALUE|
+    |---|-----|
+    |x-access-token|token_generated_on_login|
+4. Click Send.
+***
 ADD PRODUCT  
 Method --> `POST`
 
@@ -75,9 +91,15 @@ Method --> `POST`
 1. It requires `Authentication Token` and a `CSV` file.
 2. Go to `headers` in Postman.
 3. Give a key value pair in header:
-    `key: x-access-token value: token_generated_on_login`
+
+    |KEY|VALUE|
+    |---|-----|
+    |x-access-token|token_generated_on_login|
 4. Go to Body in Postman.
 5. Select Key type as file.
 6. Give key as `file`.
 7. Select the CSV file in the value.
+    |KEY|VALUE|
+    |---|-----|
+    |file|`Select CSV file`|
 8. Click Send. 
