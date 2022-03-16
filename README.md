@@ -7,7 +7,7 @@ DESCRIPTION
 
 This API is created to store and manage users and products details.
 First the user is created and after logging in the user can add products in the database.
-There is also JWT authentication. User cannot login or add any product without authentication.
+There is also JWT authentication. User cannot view any user or add any product without authentication.
 ------------------------------------------------------------------------------------------------------------
 
 REQUIREMENTS
