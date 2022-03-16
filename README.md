@@ -65,7 +65,7 @@ Method --> `POST`
     ```JSON
     {
         "auth": true,
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjFmNzRhNTVjOGY3NGI2ZDNiYzA5NWIiLCJ1c2VybmFtZSI6Im1vbnUiLCJpYXQiOjE2NDc0Mzc0ODUsImV4cCI6MTY0NzQzNzc4NX0.qUkMm4JqjNF1dZcg5BPohxvZb5PT_8YV-YTvildk0zI"
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXNzYWdlIjoiSSBrbmV3IGl0IHlvdSB3b3VsZCBjb21lIGhlcmXwn5iJIiwicmVxIjoiSWYgeW91IGxpa2UgbXkgd29yayBQbGVhc2UgY29uc2lkZXIgZm9sbG93aW5nIGFuZCBjb25uZWN0aW5nIHdpdGggbWUiLCJMaW5rZWRJbiI6Ind3dy5saW5rZWRpbi5jb20vaW4vdHJpbG9rMDEiLCJ0d2l0dGVyIjoiaHR0cHM6Ly90d2l0dGVyLmNvbS90cmlsb2tfMDEiLCJnaXRodWIiOiJodHRwczovL2dpdGh1Yi5jb20vdHJpbG9rMDEiLCJncmVldCI6IkhhdmUgYSBnb29kIGRheSDinaQifQ.gMj2zEnsYxPQ8LpsV-eR1mQ8Bwswf8NgrqVzlVfBJQY"
     }
     ```
 ***
